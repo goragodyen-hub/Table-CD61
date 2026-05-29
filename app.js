@@ -47,6 +47,8 @@ class StudyTableApp {
             timetable_A: [],
             timetable_B: [],
             tasks: [],
+            active_week: 'A',
+            viewing_week: 'A',
             auto_week_switch: true,
             last_week_monday: '',
             theme: 'dark',
@@ -677,6 +679,12 @@ class StudyTableApp {
             if (savedState) {
                 const parsed = JSON.parse(savedState);
                 this.state = { ...this.state, ...parsed };
+                if (this.state.active_week === undefined || !this.state.active_week) {
+                    this.state.active_week = 'A';
+                }
+                if (this.state.viewing_week === undefined || !this.state.viewing_week) {
+                    this.state.viewing_week = 'A';
+                }
                 if (this.state.auto_week_switch === undefined) {
                     this.state.auto_week_switch = true;
                 }
@@ -1009,6 +1017,9 @@ class StudyTableApp {
 
         // Mock Tasks
         this.state.tasks = [];
+        
+        if (!this.state.active_week) this.state.active_week = 'A';
+        if (!this.state.viewing_week) this.state.viewing_week = 'A';
         
         this.saveState();
     }
