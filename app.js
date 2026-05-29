@@ -140,6 +140,10 @@ class StudyTableApp {
         const overlay = document.getElementById('auth-overlay');
         if (overlay) overlay.classList.add('active');
         this.switchAuthView('login');
+        
+        // Hide the guest logout button when auth overlay is open
+        const headerGuestLogoutBtn = document.getElementById('header-guest-logout-btn');
+        if (headerGuestLogoutBtn) headerGuestLogoutBtn.style.display = 'none';
     }
 
     hideAuthOverlay() {
@@ -461,19 +465,28 @@ class StudyTableApp {
             });
         }
 
-        // Logout button
+        // Logout button logic (shared between sidebar and mobile header)
+        const handleLogout = () => {
+            const isGuest = this.state.profile && this.state.profile.isGuest;
+            const msg = isGuest ? 'ต้องการออกจากโหมดผู้เยี่ยมชมใช่ไหม?' : 'ต้องการออกจากระบบหรือสลับผู้ใช้ใช่ไหม?';
+            if (confirm(msg)) {
+                localStorage.removeItem('study_table_profile');
+                this.state.profile = null;
+                const navAdmin = document.getElementById('nav-admin');
+                if (navAdmin) navAdmin.style.display = 'none';
+                this.views = this.views.filter(v => v !== 'admin');
+                this.showAuthOverlay();
+            }
+        };
+
         const logoutBtn = document.getElementById('sidebar-logout-btn');
         if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                if (confirm('ต้องการออกจากระบบหรือสลับผู้ใช้ใช่ไหม?')) {
-                    localStorage.removeItem('study_table_profile');
-                    this.state.profile = null;
-                    const navAdmin = document.getElementById('nav-admin');
-                    if (navAdmin) navAdmin.style.display = 'none';
-                    this.views = this.views.filter(v => v !== 'admin');
-                    this.showAuthOverlay();
-                }
-            });
+            logoutBtn.addEventListener('click', handleLogout);
+        }
+
+        const headerGuestLogoutBtn = document.getElementById('header-guest-logout-btn');
+        if (headerGuestLogoutBtn) {
+            headerGuestLogoutBtn.addEventListener('click', handleLogout);
         }
     }
 
@@ -481,12 +494,16 @@ class StudyTableApp {
         if (!this.state.profile) return;
         const nameEl = document.getElementById('sidebar-profile-name');
         const codeEl = document.getElementById('sidebar-profile-code');
+        const headerGuestLogoutBtn = document.getElementById('header-guest-logout-btn');
+        
         if (nameEl) nameEl.textContent = `${this.state.profile.nickname} (${this.state.profile.classroom})`;
         if (codeEl) {
             if (this.state.profile.isGuest) {
                 codeEl.textContent = `โหมดผู้เยี่ยมชม (อ่านเท่านั้น)`;
+                if (headerGuestLogoutBtn) headerGuestLogoutBtn.style.display = 'inline-flex';
             } else {
                 codeEl.textContent = `รหัส: ${this.state.profile.accessCode}`;
+                if (headerGuestLogoutBtn) headerGuestLogoutBtn.style.display = 'none';
             }
         }
         
