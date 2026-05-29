@@ -1,0 +1,150 @@
+// =========================================================================
+// Google Apps Script สำหรับระบบซิงก์ข้อมูลสองทาง (Two-way Sync) - Study Table
+// วิธีใช้งาน: ไปที่ Google Sheets -> ส่วนขยาย (Extensions) -> แอปส์สคริปต์ (Apps Script)
+// ลบโค้ดเดิมทั้งหมดทิ้ง แล้วนำโค้ดด้านล่างนี้ไปวางทั้งหมด จากนั้นกด บันทึก และกด ใช้งานได้จริง (Deploy)
+// =========================================================================
+
+/**
+ * Add CORS headers to a response.
+ * @param {GoogleAppsScript.Content.TextOutput} output
+ * @return {GoogleAppsScript.Content.TextOutput}
+ */
+function addCorsHeaders(output) {
+  return output
+    .setHeader('Access-Control-Allow-Origin', '*')
+    .setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
+/**
+ * Handle pre‑flight OPTIONS requests.
+ */
+function doOptions(e) {
+  // Return an empty response with CORS headers.
+  return addCorsHeaders(
+    ContentService.createTextOutput('')
+      .setMimeType(ContentService.MimeType.JSON)
+  );
+}
+
+/**
+ * Handle POST requests from the web app.
+ */
+function doPost(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var payload = JSON.parse(e.postData.contents);
+    var changes = payload.changes || [];
+
+    // 1. Process incoming changes (upsert / delete)
+    if (changes.length > 0) {
+      var dataRange = sheet.getDataRange();
+      var values = dataRange.getValues();
+
+      changes.forEach(function(change) {
+        var id = change.id || (change.task && change.task.id);
+        if (!id) return;
+
+        // Find row index (1‑based) where ID matches
+        var rowIndex = -1;
+        for (var i = 1; i < values.length; i++) {
+          if (values[i][0] && values[i][0].toString() === id.toString()) {
+            rowIndex = i + 1;
+            break;
+          }
+        }
+
+        if (change.type === 'delete') {
+          if (rowIndex !== -1) {
+            sheet.deleteRow(rowIndex);
+            values.splice(rowIndex - 1, 1);
+          }
+        } else if (change.type === 'upsert') {
+          var t = change.task;
+          var rowData = [
+            t.id,
+            t.title || '',
+            t.subject || '',
+            t.priority || 'medium',
+            t.dueDate || '',
+            t.notes || '',
+            t.completed ? true : false
+          ];
+
+          if (rowIndex !== -1) {
+            sheet.getRange(rowIndex, 1, 1, 7).setValues([rowData]);
+            values[rowIndex - 1] = rowData;
+          } else {
+            sheet.appendRow(rowData);
+            values.push(rowData);
+          }
+        }
+      });
+    }
+
+    // 2. Return the updated task list
+    var resp = getTasksResponse(sheet);
+    return addCorsHeaders(resp);
+  } catch (error) {
+    var err = ContentService.createTextOutput(
+      JSON.stringify({ success: false, error: error.toString() })
+    ).setMimeType(ContentService.MimeType.JSON);
+    return addCorsHeaders(err);
+  }
+}
+
+/**
+ * Handle GET requests (fetch all tasks).
+ */
+function doGet(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var resp = getTasksResponse(sheet);
+    return addCorsHeaders(resp);
+  } catch (error) {
+    var err = ContentService.createTextOutput(
+      JSON.stringify({ success: false, error: error.toString() })
+    ).setMimeType(ContentService.MimeType.JSON);
+    return addCorsHeaders(err);
+  }
+}
+
+/**
+ * Build the JSON response containing all tasks.
+ */
+function getTasksResponse(sheet) {
+  var data = sheet.getDataRange().getValues();
+  var tasks = [];
+
+  // Skip header row (row 0)
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (!row[0]) continue; // no ID
+    tasks.push({
+      id: row[0].toString(),
+      title: row[1] ? row[1].toString() : '',
+      subject: row[2] ? row[2].toString() : '',
+      priority: row[3] ? row[3].toString() : 'medium',
+      dueDate: row[4] ? formatDate(row[4]) : '',
+      notes: row[5] ? row[5].toString() : '',
+      completed: row[6] === true || row[6].toString().toUpperCase() === 'TRUE'
+    });
+  }
+
+  return ContentService.createTextOutput(
+    JSON.stringify({ success: true, tasks: tasks })
+  ).setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * Format a date value from the sheet to YYYY‑MM‑DD.
+ */
+function formatDate(dateVal) {
+  if (dateVal instanceof Date) {
+    var year = dateVal.getFullYear();
+    var month = String(dateVal.getMonth() + 1).padStart(2, '0');
+    var day = String(dateVal.getDate()).padStart(2, '0');
+    return year + '-' + month + '-' + day;
+  }
+  return dateVal ? dateVal.toString().split('T')[0] : '';
+}

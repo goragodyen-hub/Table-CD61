@@ -1,0 +1,23 @@
+{
+  "name": "Study Table - ตารางเรียน & แดชบอร์ดอัจฉริยะ",
+  "short_name": "Study Table",
+  "description": "แดชบอร์ดจัดการชีวิตการเรียนระดับพรีเมียมพร้อมตารางเรียนสลับ A/B และตัวช่วยสร้างสมาธิ",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#070913",
+  "theme_color": "#b927fc",
+  "orientation": "any",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "time-table.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "time-table.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

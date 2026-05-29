@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Table - ตารางเรียน & แดชบอร์ดวางแผนการเรียนอัจฉริยะ</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Favicon and Touch Icon -->
+    <link rel="icon" type="image/png" href="time-table.png">
+    <link rel="apple-touch-icon" href="time-table.png">
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#070913">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Authentication Overlay (Access Code & Nickname) -->
+    <div class="auth-overlay" id="auth-overlay">
+        <div class="auth-card glass-card">
+            <div class="auth-header">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <h2>Study Table</h2>
+                <p>ตารางเรียน & แดชบอร์ดวางแผนการเรียนอัจฉริยะ</p>
+            </div>
+            
+            <!-- Login View -->
+            <div class="auth-view active" id="auth-login-view">
+                <h3>เข้าสู่ระบบ</h3>
+                <form id="auth-login-form">
+                    <div class="form-group">
+                        <label for="auth-access-code" class="form-label">รหัสเข้าใช้งานส่วนตัว (Access Code)</label>
+                        <input type="text" id="auth-access-code" class="form-input" placeholder="เช่น ST-982-AX" required style="text-align: center; text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+                        <i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ
+                    </button>
+                </form>
+                <div class="auth-switch">
+                    <span>ยังไม่มีบัญชีตารางเรียน?</span>
+                    <button class="btn btn-text" id="go-to-register-btn">สร้างโปรไฟล์ใหม่</button>
+                </div>
+            </div>
+            
+            <!-- Register View -->
+            <div class="auth-view" id="auth-register-view">
+                <h3>สร้างโปรไฟล์ใหม่</h3>
+                <form id="auth-register-form">
+                    <div class="form-group">
+                        <label for="auth-nickname" class="form-label">ชื่อจริง หรือ ชื่อเล่นของคุณ</label>
+                        <input type="text" id="auth-nickname" class="form-input" placeholder="เช่น น้องต้อม" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="auth-classroom" class="form-label">ระดับชั้นเรียน / ห้องเรียนของคุณ</label>
+                        <select id="auth-classroom" class="form-input" required style="cursor: pointer; background: rgba(255, 255, 255, 0.05); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 12px; height: auto;">
+                            <option value="ม.2/3" style="background:#0c1126; color:#fff;" selected>ชั้น ม.2/3</option>
+                            <option value="ม.2/1" style="background:#0c1126; color:#fff;">ชั้น ม.2/1</option>
+                            <option value="ม.2/2" style="background:#0c1126; color:#fff;">ชั้น ม.2/2</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+                        <i class="fa-solid fa-user-plus"></i> สมัครใช้งานและรับรหัส
+                    </button>
+                </form>
+                <div class="auth-switch">
+                    <span>มีรหัส Access Code อยู่แล้ว?</span>
+                    <button class="btn btn-text" id="go-to-login-btn">เข้าสู่ระบบตรงนี้</button>
+                </div>
+            </div>
+
+            <!-- Quick Guest Access View -->
+            <div class="auth-guest-access" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px dashed rgba(255, 255, 255, 0.15); text-align: center;">
+                <span style="display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px;">
+                    <i class="fa-solid fa-bolt text-accent-B"></i> หรือเข้าดูด่วนไม่ต้องล็อกอิน (โหมดผู้เยี่ยมชม)
+                </span>
+                <div style="display: flex; gap: 8px; justify-content: center;">
+                    <button class="btn btn-xs btn-secondary-outline guest-login-btn" data-classroom="ม.2/1" style="flex: 1; border-color: rgba(255,255,255,0.15); color: var(--text-primary); cursor: pointer;">ม.2/1</button>
+                    <button class="btn btn-xs btn-secondary-outline guest-login-btn" data-classroom="ม.2/2" style="flex: 1; border-color: rgba(255,255,255,0.15); color: var(--text-primary); font-weight: 700; border-width: 2px; cursor: pointer;">ม.2/2</button>
+                    <button class="btn btn-xs btn-secondary-outline guest-login-btn" data-classroom="ม.2/3" style="flex: 1; border-color: rgba(255,255,255,0.15); color: var(--text-primary); cursor: pointer;">ม.2/3</button>
+                </div>
+            </div>
+
+            <!-- Success Registration View -->
+            <div class="auth-view" id="auth-success-view">
+                <div class="success-icon animate-scale" style="text-align: center; margin-bottom: 1rem;">
+                    <i class="fa-solid fa-circle-check" style="color: var(--color-emerald); font-size: 3rem;"></i>
+                </div>
+                <h3 style="text-align: center;">สร้างโปรไฟล์สำเร็จแล้ว! 🎉</h3>
+                <p style="text-align: center; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">โปรดถ่ายรูปหน้าจอนี้ หรือจดบันทึกรหัสประจำตัวของคุณไว้ด้านล่าง เพื่อใช้ล็อกอินเข้าสู่ระบบในอุปกรณ์เครื่องอื่น</p>
+                <div class="access-code-box" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: 12px; text-align: center; margin-bottom: 1.5rem;">
+                    <span class="code-label" style="display: block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">รหัสเข้าใช้งานส่วนตัวของคุณ</span>
+                    <span class="code-value" id="generated-access-code" style="display: block; font-size: 1.8rem; font-weight: 800; color: var(--color-blue); letter-spacing: 2px;">ST-000-XX</span>
+                    <button type="button" class="btn btn-xs btn-secondary-outline" id="copy-access-code-btn" style="margin-top: 10px; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-copy"></i> คัดลอกรหัส
+                    </button>
+                </div>
+                <button type="button" class="btn btn-primary btn-block" id="start-app-btn" style="width: 100%;">
+                    <i class="fa-solid fa-play"></i> เริ่มเข้าใช้งานแอปเลย!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <button class="sidebar-close-btn" id="sidebar-close" title="ปิดเมนู">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="sidebar-brand">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <h2>Study Table</h2>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active" data-view="dashboard" id="nav-dashboard">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>แดชบอร์ด</span>
+                </a>
+                <a href="#" class="menu-item" data-view="timetable" id="nav-timetable">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>ตารางเรียน A/B</span>
+                </a>
+                <a href="#" class="menu-item" data-view="tasks" id="nav-tasks">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>งาน & การบ้าน</span>
+                </a>
+                <a href="#" class="menu-item" data-view="pomodoro" id="nav-pomodoro">
+                    <i class="fa-solid fa-stopwatch"></i>
+                    <span>จับเวลาโฟกัส</span>
+                </a>
+                <a href="#" class="menu-item admin-only" data-view="admin" id="nav-admin" style="display: none;">
+                    <i class="fa-solid fa-user-shield text-accent-B"></i>
+                    <span>จัดการนักเรียน</span>
+                </a>
+            </nav>
+
+            <div class="active-week-widget">
+                <div class="widget-label">สัปดาห์ปัจจุบัน</div>
+                <div class="active-week-badge" id="sidebar-active-week-badge">ตาราง B</div>
+                <button class="btn btn-secondary-outline btn-xs" id="sidebar-toggle-week-btn">
+                    <i class="fa-solid fa-rotate"></i> สลับสัปดาห์
+                </button>
+                <label class="auto-week-toggle" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; margin-top: 8px; color: var(--text-secondary); cursor: pointer; user-select: none; border-top: 1px solid var(--border-color); padding-top: 8px;">
+                    <input type="checkbox" id="sidebar-auto-week-checkbox" checked style="cursor: pointer; width: 14px; height: 14px; accent-color: var(--accent-B);">
+                    <span>สลับอัตโนมัติทุกสัปดาห์</span>
+                </label>
+
+                <button class="btn btn-primary btn-xs" id="sidebar-install-btn" style="display: none; margin-top: 8px; width: 100%; align-items: center; justify-content: center; gap: 6px;">
+                    <i class="fa-solid fa-download"></i> ติดตั้งแอปบนมือถือ/PC
+                </button>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="profile-card" id="sidebar-profile-card">
+                    <div class="profile-avatar">
+                        <i class="fa-solid fa-user-graduate"></i>
+                        <span class="avatar-emoji">🎒</span>
+                    </div>
+                    <div class="profile-info">
+                        <h4 id="sidebar-profile-name">นักเรียน ม.2/3</h4>
+                        <p id="sidebar-profile-code">เข้าเฝ้า</p>
+                    </div>
+                    <button class="icon-btn logout-btn" id="sidebar-logout-btn" title="ออกจากระบบ / สลับผู้ใช้" style="margin-left: auto; color: var(--color-rose); font-size: 1.1rem; padding: 0.5rem; display: flex; align-items: center; justify-content: center; background: transparent; border: none; cursor: pointer; transition: transform 0.2s;">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <button class="icon-btn menu-toggle-btn" id="sidebar-toggle" title="เปิดเมนู">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="header-welcome">
+                    <h1 id="greeting-title">สวัสดีตอนบ่าย, ยินดีต้อนรับ! 👋</h1>
+                    <p id="header-date">วันพฤหัสบดีที่ 21 พฤษภาคม 2026 | สัปดาห์ปัจจุบัน: <strong class="text-accent-B">ตาราง B</strong></p>
+                </div>
+                <div class="header-actions">
+                    <!-- Week Status Banner -->
+                    <div class="week-status-banner" id="header-week-banner">
+                        <span class="pulse-indicator"></span>
+                        <span>ขณะนี้ใช้งาน: <strong>ตาราง B</strong></span>
+                    </div>
+
+                    <!-- Theme Toggle -->
+                    <button class="icon-btn theme-toggle-btn" id="theme-toggle" title="สลับธีม มืด/สว่าง">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- VIEW 1: DASHBOARD -->
+            <section class="content-view active" id="view-dashboard">
+                <div class="dashboard-grid">
+                    <!-- Left Section: Welcome banner & daily schedule -->
+                    <div class="dashboard-left">
+                        <!-- Hero Card -->
+                        <div class="hero-card">
+                            <div class="hero-content">
+                                <h2>สู้ๆ สำหรับการเรียนวันนี้! 🚀</h2>
+                                <p>วันนี้คุณมีเรียนทั้งหมด <span id="dash-class-count">0</span> วิชา และงานที่ค้างอยู่ <span id="dash-task-count">0</span> งาน มาพยายามไปด้วยกันนะ!</p>
+                                <button class="btn btn-primary" onclick="app.switchView('pomodoro')">
+                                    <i class="fa-solid fa-play"></i> เริ่มจับเวลาโฟกัสเลย
+                                </button>
+                            </div>
+                            <div class="hero-illustration">
+                                <i class="fa-solid fa-book-open-reader"></i>
+                            </div>
+                        </div>
+
+                        <!-- Today's Classes -->
+                        <div class="card today-classes-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-clock-three"></i> คาบเรียนวันนี้ (<span id="dash-today-schedule-label">ตาราง B</span>)</h3>
+                                <button class="btn btn-text" onclick="app.switchView('timetable')">ดูตารางเรียนทั้งหมด <i class="fa-solid fa-arrow-right"></i></button>
+                            </div>
+                            <div class="card-body">
+                                <div class="today-classes-list" id="today-classes-container">
+                                    <!-- Dynamic Items -->
+                                    <div class="empty-state">
+                                        <i class="fa-solid fa-calendar-check"></i>
+                                        <p>วันนี้ไม่มีวิชาเรียน พักผ่อนให้เต็มที่นะ!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Section: To-dos & Pomodoro Mini & Analytics Mini -->
+                    <div class="dashboard-right">
+                        <!-- Quick Focus Widget -->
+                        <div class="card mini-focus-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-stopwatch text-accent-B"></i> โฟกัสรวดเร็ว</h3>
+                            </div>
+                            <div class="card-body mini-focus-body">
+                                <div class="mini-timer-display" id="mini-timer-time">25:00</div>
+                                <div class="mini-timer-controls">
+                                    <button class="btn btn-sm btn-primary" id="mini-timer-play-btn"><i class="fa-solid fa-play"></i></button>
+                                    <button class="btn btn-sm btn-secondary" id="mini-timer-reset-btn"><i class="fa-solid fa-rotate-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mini Task List -->
+                        <div class="card mini-tasks-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-list-check"></i> งานด่วนที่สุด</h3>
+                                <button class="btn btn-text" onclick="app.switchView('tasks')">จัดการงาน <i class="fa-solid fa-arrow-right"></i></button>
+                            </div>
+                            <div class="card-body">
+                                <div class="mini-tasks-list" id="mini-tasks-container">
+                                    <!-- Dynamic Items -->
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 2: TIMETABLE A/B -->
+            <section class="content-view" id="view-timetable">
+                <div class="view-header">
+                    <div class="title-area">
+                        <h2 class="view-title">จัดการตารางเรียนสลับรายสัปดาห์ (A/B Timetable)</h2>
+                        <p class="view-subtitle">แยกระหว่างตาราง A และ B สำหรับโรงเรียนที่มีการสลับตารางเวียนสัปดาห์</p>
+                    </div>
+                    <button class="btn btn-primary" id="add-class-btn">
+                        <i class="fa-solid fa-plus"></i> เพิ่มวิชาเรียนในตาราง
+                    </button>
+                </div>
+
+                <!-- Schedule Switch Tabs -->
+                <div class="timetable-control-panel">
+                    <div class="week-tabs">
+                        <button class="week-tab active" id="tab-week-A" onclick="app.setTimetableViewWeek('A')">
+                            <i class="fa-solid fa-calendar"></i> ตารางสัปดาห์ A
+                        </button>
+                        <button class="week-tab" id="tab-week-B" onclick="app.setTimetableViewWeek('B')">
+                            <i class="fa-solid fa-calendar"></i> ตารางสัปดาห์ B
+                        </button>
+                    </div>
+
+                    <!-- Current Week Selector action -->
+                    <div class="current-week-setter-container">
+                        <span id="timetable-week-viewing-status">คุณกำลังดู: <strong>ตาราง B</strong></span>
+                        <button class="btn btn-sm btn-accent-glow" id="set-current-week-active-btn">
+                            <i class="fa-solid fa-star"></i> ตั้งค่าตารางนี้เป็น "สัปดาห์ปัจจุบัน"
+                        </button>
+                        <button class="btn btn-sm btn-secondary-outline" id="reset-default-timetable-btn" title="โหลดค่าเริ่มต้นจากตารางเรียน ม.2/3 เข้าเฝ้า">
+                            <i class="fa-solid fa-arrow-rotate-left"></i> โหลดตารางเรียนเริ่มต้น ม.2/3
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Timetable Grid Container -->
+                <div class="timetable-grid-wrapper">
+                    <div class="timetable-grid" id="timetable-grid-root">
+                        <!-- Hour Column headers and day row headers will be drawn here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 3: TASKS & ASSIGNMENTS -->
+            <section class="content-view" id="view-tasks">
+                <div class="view-header">
+                    <div class="title-area">
+                        <h2 class="view-title">บันทึกวางแผนงานและการบ้าน</h2>
+                        <p class="view-subtitle">ติดตามการบ้าน โครงงาน และการเตรียมสอบอย่างเป็นระบบ</p>
+                    </div>
+                    <button class="btn btn-primary" id="add-task-btn">
+                        <i class="fa-solid fa-plus"></i> เพิ่มรายการงานใหม่
+                    </button>
+                </div>
+
+                <!-- Filter Row -->
+                <div class="tasks-filter-bar">
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">งานทั้งหมด (<span id="count-all-tasks">0</span>)</button>
+                        <button class="filter-btn" data-filter="pending">ที่ค้างอยู่ (<span id="count-pending-tasks">0</span>)</button>
+                        <button class="filter-btn" data-filter="completed">เสร็จสิ้นแล้ว (<span id="count-completed-tasks">0</span>)</button>
+                    </div>
+                    <div class="task-sort">
+                        <label for="task-sort-select"><i class="fa-solid fa-arrow-down-wide-short"></i> เรียงตาม:</label>
+                        <select id="task-sort-select" class="select-input">
+                            <option value="dueDate">วันครบกำหนด</option>
+                            <option value="priority">ระดับความสำคัญ</option>
+                            <option value="subject">รายวิชา</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Tasks grid grouped or in elegant lists -->
+                <div class="tasks-container">
+                    <div class="tasks-list" id="tasks-list-root">
+                        <!-- Dynamic items from LocalStorage -->
+                        <div class="empty-state">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                            <p>ไม่มีงานที่ค้างอยู่ สบายใจได้เลย!</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 4: POMODORO FOCUS TIMER -->
+            <section class="content-view" id="view-pomodoro">
+                <div class="view-header">
+                    <div class="title-area">
+                        <h2 class="view-title">เครื่องจับเวลาอ่านหนังสือ Pomodoro Focus Timer</h2>
+                        <p class="view-subtitle">รักษาสมาธิในการเรียนด้วยเทคนิค Pomodoro (เรียน 25 นาที พัก 5 นาที)</p>
+                    </div>
+                </div>
+
+                <div class="pomodoro-timer-layout">
+                    <!-- Big Circular countdown -->
+                    <div class="pomodoro-left">
+                        <div class="pomodoro-card">
+                            <div class="pomodoro-modes">
+                                <button class="mode-btn active" data-duration="1500" data-mode="study">
+                                    <i class="fa-solid fa-brain"></i> โฟกัสเรียน (25m)
+                                </button>
+                                <button class="mode-btn" data-duration="300" data-mode="short-break">
+                                    <i class="fa-solid fa-mug-hot"></i> พักสั้น (5m)
+                                </button>
+                                <button class="mode-btn" data-duration="900" data-mode="long-break">
+                                    <i class="fa-solid fa-couch"></i> พักยาว (15m)
+                                </button>
+                            </div>
+
+                            <div class="circle-timer-container">
+                                <svg class="timer-svg" viewBox="0 0 200 200">
+                                    <circle class="timer-track" cx="100" cy="100" r="90"></circle>
+                                    <circle class="timer-progress" cx="100" cy="100" r="90" id="timer-progress-circle"></circle>
+                                </svg>
+                                <div class="timer-content-box">
+                                    <span class="timer-countdown" id="timer-time">25:00</span>
+                                    <span class="timer-status-text" id="timer-status">ช่วงเวลาโฟกัส</span>
+                                </div>
+                            </div>
+
+                            <div class="timer-action-controls">
+                                <button class="timer-ctrl-btn play" id="timer-play-pause-btn" title="เล่น / หยุดชั่วคราว">
+                                    <i class="fa-solid fa-play"></i>
+                                </button>
+                                <button class="timer-ctrl-btn reset" id="timer-reset-btn" title="รีเซ็ต">
+                                    <i class="fa-solid fa-rotate-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ambient Noise Controller -->
+                    <div class="pomodoro-right">
+                        <!-- Ambient Noises -->
+                        <div class="card ambient-sound-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-headphones"></i> บรรยากาศสร้างสมาธิ (Ambient Sounds)</h3>
+                            </div>
+                            <div class="card-body">
+                                <p class="ambient-desc">กดเปิดเสียงคลอเบาๆ ช่วยให้สมองหลั่งสารสมาธิและป้องกันการดึงความสนใจจากสิ่งแวดล้อม</p>
+                                
+                                <div class="ambient-grid">
+                                    <div class="ambient-item" id="sound-lofi">
+                                        <div class="ambient-icon"><i class="fa-solid fa-music"></i></div>
+                                        <div class="ambient-details">
+                                            <h4>ดนตรีผ่อนคลาย Lo-Fi Beats</h4>
+                                            <p>บีทช้าๆ ฟังสบายลดความเครียด</p>
+                                        </div>
+                                        <button class="sound-toggle-btn" onclick="app.toggleAmbientSound('lofi')">
+                                            <i class="fa-solid fa-play"></i>
+                                        </button>
+                                    </div>
+
+                                    <div class="ambient-item" id="sound-rain">
+                                        <div class="ambient-icon"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
+                                        <div class="ambient-details">
+                                            <h4>เสียงฝนตกแสนสงบ (Rainy Day)</h4>
+                                            <p>เสียงฝนตกกระทบหลังคาสร้างความจดจ่อ</p>
+                                        </div>
+                                        <button class="sound-toggle-btn" onclick="app.toggleAmbientSound('rain')">
+                                            <i class="fa-solid fa-play"></i>
+                                        </button>
+                                    </div>
+
+                                    <div class="ambient-item" id="sound-forest">
+                                        <div class="ambient-icon"><i class="fa-solid fa-tree"></i></div>
+                                        <div class="ambient-details">
+                                            <h4>เสียงธรรมชาติ & ป่าไม้ (Forest)</h4>
+                                            <p>เสียงนกร้อง ลมพัดใบไม้ รู้สึกโล่งสบาย</p>
+                                        </div>
+                                        <button class="sound-toggle-btn" onclick="app.toggleAmbientSound('forest')">
+                                            <i class="fa-solid fa-play"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="volume-slider-box">
+                                    <i class="fa-solid fa-volume-low"></i>
+                                    <input type="range" id="ambient-volume" min="0" max="100" value="50" class="volume-slider">
+                                    <i class="fa-solid fa-volume-high"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Focused tasks during this session -->
+                        <div class="card session-stats-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-medal"></i> ผลงานวันนี้</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="stat-metrics">
+                                    <div class="stat-metric-item">
+                                        <span class="metric-val" id="pomodoro-session-count">0</span>
+                                        <span class="metric-lbl">รอบมะเขือเทศสะสม</span>
+                                    </div>
+                                    <div class="stat-metric-item">
+                                        <span class="metric-val" id="pomodoro-focus-minutes">0</span>
+                                        <span class="metric-lbl">เวลาโฟกัสรวม (นาที)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 5: ADMIN / STUDENT PROFILES (Teacher Only) -->
+            <section class="content-view" id="view-admin">
+                <div class="view-header">
+                    <div class="title-area">
+                        <h2 class="view-title"><i class="fa-solid fa-user-shield text-accent-B"></i> จัดการข้อมูลนักเรียน</h2>
+                        <p class="view-subtitle">ดูบัญชีนักเรียน ค้นหารหัส Access Code และส่องรายงานสถานะการบ้านของนักเรียนรายบุคคล</p>
+                    </div>
+                    <button class="btn btn-secondary-outline" id="admin-refresh-btn">
+                        <i class="fa-solid fa-arrows-rotate"></i> ดึงข้อมูลล่าสุด
+                    </button>
+                </div>
+
+                <!-- Admin Controls -->
+                <div class="tasks-filter-bar" style="margin-bottom: 1.5rem; justify-content: flex-start; gap: 1rem; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 0.75rem 1rem; border-radius: 12px;">
+                    <div class="search-input-wrapper" style="flex-grow: 1; max-width: 400px; position: relative;">
+                        <input type="text" id="admin-search-student" class="form-input" placeholder="🔍 ค้นหาชื่อเล่นนักเรียน..." style="padding: 0.6rem 1rem; width: 100%;">
+                    </div>
+                    <div class="admin-total-indicator" style="font-size: 0.9rem; color: var(--text-secondary);">
+                        <i class="fa-solid fa-users"></i> นักเรียนลงทะเบียน: <strong id="admin-student-count" style="color: var(--text-primary)">0</strong> คน
+                    </div>
+                </div>
+
+                <!-- Student Cards Container -->
+                <div class="admin-student-grid" id="admin-student-list-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 1rem;">
+                    <!-- Dynamic Student Cards will be drawn here -->
+                </div>
+            </section>
+
+
+        </main>
+    </div>
+
+    <!-- MODAL 1: ADD/EDIT CLASS -->
+    <div class="modal" id="class-modal">
+        <div class="modal-content glass-card animate-zoom">
+            <div class="modal-header">
+                <h3 id="class-modal-title">เพิ่มวิชาเรียนใหม่</h3>
+                <button class="close-btn" id="class-modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="class-form">
+                    <input type="hidden" id="edit-class-id">
+                    
+                    <!-- Week Select Group -->
+                    <div class="form-group">
+                        <label class="form-label">กำหนดสำหรับสัปดาห์ *</label>
+                        <div class="form-radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="class-week" value="A" id="class-week-A" checked>
+                                <span>สัปดาห์ A</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="class-week" value="B" id="class-week-B">
+                                <span>สัปดาห์ B</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="class-name" class="form-label">ชื่อวิชา / วิชาเรียน *</label>
+                        <input type="text" id="class-name" class="form-input" placeholder="เช่น คณิตศาสตร์, วิทยาศาสตร์ทั่วไป" required>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="class-room" class="form-label">ห้องเรียน / ตึกเรียน</label>
+                            <input type="text" id="class-room" class="form-input" placeholder="เช่น 432, ตึกวิทย์">
+                        </div>
+                        <div class="form-group">
+                            <label for="class-teacher" class="form-label">อาจารย์ผู้สอน</label>
+                            <input type="text" id="class-teacher" class="form-input" placeholder="เช่น ครูสมเจตน์">
+                        </div>
+                    </div>
+
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label for="class-day" class="form-label">วันเรียน *</label>
+                            <select id="class-day" class="form-input" required>
+                                <option value="1">วันจันทร์</option>
+                                <option value="2">วันอังคาร</option>
+                                <option value="3">วันพุธ</option>
+                                <option value="4">วันพฤหัสบดี</option>
+                                <option value="5">วันศุกร์</option>
+                                <option value="6">วันเสาร์</option>
+                                <option value="0">วันอาทิตย์</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="class-start-time" class="form-label">เวลาเริ่มเรียน *</label>
+                            <input type="time" id="class-start-time" class="form-input" min="07:00" max="20:00" value="08:30" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="class-end-time" class="form-label">เวลาเลิกเรียน *</label>
+                            <input type="time" id="class-end-time" class="form-input" min="07:00" max="20:00" value="10:10" required>
+                        </div>
+                    </div>
+
+                    <!-- Color Picker -->
+                    <div class="form-group">
+                        <label class="form-label">สีธีมประจำวิชา</label>
+                        <div class="color-options-grid">
+                            <label class="color-option-item color-opt-blue">
+                                <input type="radio" name="class-color" value="var(--color-blue)" checked>
+                                <span style="background-color: var(--color-blue)"></span>
+                            </label>
+                            <label class="color-option-item color-opt-purple">
+                                <input type="radio" name="class-color" value="var(--color-purple)">
+                                <span style="background-color: var(--color-purple)"></span>
+                            </label>
+                            <label class="color-option-item color-opt-rose">
+                                <input type="radio" name="class-color" value="var(--color-rose)">
+                                <span style="background-color: var(--color-rose)"></span>
+                            </label>
+                            <label class="color-option-item color-opt-amber">
+                                <input type="radio" name="class-color" value="var(--color-amber)">
+                                <span style="background-color: var(--color-amber)"></span>
+                            </label>
+                            <label class="color-option-item color-opt-emerald">
+                                <input type="radio" name="class-color" value="var(--color-emerald)">
+                                <span style="background-color: var(--color-emerald)"></span>
+                            </label>
+                            <label class="color-option-item color-opt-violet">
+                                <input type="radio" name="class-color" value="var(--color-violet)">
+                                <span style="background-color: var(--color-violet)"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary-outline" id="class-modal-cancel">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary" id="class-save-btn">บันทึกวิชาเรียน</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: ADD/EDIT TASK -->
+    <div class="modal" id="task-modal">
+        <div class="modal-content glass-card animate-zoom">
+            <div class="modal-header">
+                <h3 id="task-modal-title">เพิ่มงานและการบ้านใหม่</h3>
+                <button class="close-btn" id="task-modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="task-form">
+                    <input type="hidden" id="edit-task-id">
+
+                    <div class="form-group">
+                        <label for="task-title" class="form-label">ชื่องาน / หัวข้องานที่ต้องทำ *</label>
+                        <input type="text" id="task-title" class="form-input" placeholder="เช่น การบ้านบทที่ 5 หน้านี้ทำส่งครูด้วย" required>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="task-subject" class="form-label">เกี่ยวข้องกับวิชา (หรือระบุกว้างๆ)</label>
+                            <input type="text" id="task-subject" class="form-input" placeholder="เช่น ภาษาไทย, ฟิสิกส์">
+                        </div>
+                        <div class="form-group">
+                            <label for="task-priority" class="form-label">ระดับความสำคัญ</label>
+                            <select id="task-priority" class="form-input">
+                                <option value="low">ต่ำ (ชิวๆ)</option>
+                                <option value="medium" selected>ปานกลาง (ควรทำ)</option>
+                                <option value="high">สูง (ด่วนมากต้องส่ง!)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="task-due-date" class="form-label">วันครบกำหนดส่งงาน *</label>
+                        <input type="date" id="task-due-date" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="task-notes" class="form-label">รายละเอียดเพิ่มเติม</label>
+                        <textarea id="task-notes" class="form-input" rows="3" placeholder="ระบุสิ่งที่ครูสั่งหน้าไหน ข้อมูลเสริม หรือสิ่งที่จำเป็นต้องใช้..."></textarea>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary-outline" id="task-modal-cancel">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">บันทึกรายการงาน</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: STUDENT HOMEWORK VIEWER (Teacher Only) -->
+    <div class="modal" id="student-tasks-modal">
+        <div class="modal-content glass-card animate-zoom" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-list-check text-accent-B"></i> รายงานการบ้าน: <span id="student-tasks-modal-name">น้องต้อม ป.3</span></h3>
+                <button class="close-btn" id="student-tasks-modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" style="max-height: 65vh; overflow-y: auto; padding-right: 8px;">
+                <div class="student-tasks-stats" style="display: flex; gap: 15px; margin-bottom: 1.25rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 12px 18px; border-radius: 12px; font-size: 0.9rem;">
+                    <div style="flex:1; text-align:center;"><i class="fa-solid fa-clipboard-list text-accent-B"></i> งานทั้งหมด: <strong id="student-tasks-total" style="color:var(--text-primary)">0</strong></div>
+                    <div style="flex:1; text-align:center;"><i class="fa-solid fa-clock-three" style="color:var(--color-amber)"></i> ค้างอยู่: <strong id="student-tasks-pending" style="color:var(--text-primary)">0</strong></div>
+                    <div style="flex:1; text-align:center;"><i class="fa-solid fa-circle-check" style="color:var(--color-emerald)"></i> เสร็จแล้ว: <strong id="student-tasks-completed" style="color:var(--text-primary)">0</strong></div>
+                </div>
+                <div id="student-tasks-list" class="student-tasks-list" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Dynamic Student Homework Cards will be drawn here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="student-tasks-modal-ok" style="width:100%">ปิดหน้าต่าง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase JS Client SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Web Audio API Script Integration and main entry point -->
+    <script src="app.js"></script>
+</body>
+</html>
