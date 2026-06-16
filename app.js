@@ -472,11 +472,26 @@ class StudyTableApp {
             const isGuest = this.state.profile && this.state.profile.isGuest;
             const msg = isGuest ? 'ต้องการออกจากโหมดผู้เยี่ยมชมใช่ไหม?' : 'ต้องการออกจากระบบหรือสลับผู้ใช้ใช่ไหม?';
             if (confirm(msg)) {
+                // Clear profile
                 localStorage.removeItem('study_table_profile');
+                // Clear saved state so next user doesn't inherit previous user's timetable/tasks
+                localStorage.removeItem('study_table_state');
+
+                // Reset in-memory state completely
                 this.state.profile = null;
+                this.state.tasks = [];
+                this.state.timetable_A = [];
+                this.state.timetable_B = [];
+                this.state.syncQueue = [];
+                this.state.isSyncing = false;
+
+                // Reset view to dashboard
+                this.currentView = 'dashboard';
+
                 const navAdmin = document.getElementById('nav-admin');
                 if (navAdmin) navAdmin.style.display = 'none';
                 this.views = this.views.filter(v => v !== 'admin');
+
                 this.showAuthOverlay();
             }
         };
