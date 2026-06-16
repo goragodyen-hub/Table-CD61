@@ -22,8 +22,8 @@
     /* Neon Accents */
     --color-blue: #00f2fe;
     --color-blue-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-    --color-purple: #b927fc;
-    --color-purple-gradient: linear-gradient(135deg, #b927fc 0%, #eec2ff 100%);
+    --color-purple: #00e5ff;
+    --color-purple-gradient: linear-gradient(135deg, #00e5ff 0%, #89f7fe 100%);
     --color-rose: #ff0844;
     --color-rose-gradient: linear-gradient(135deg, #ff0844 0%, #ffb199 100%);
     --color-amber: #f6d365;
@@ -39,7 +39,7 @@
     --accent-B-grad: var(--color-purple-gradient);
 
     --shadow-main: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    --shadow-glow: 0 0 15px rgba(185, 39, 252, 0.2);
+    --shadow-glow: 0 0 15px rgba(0, 229, 255, 0.25);
     --shadow-glow-A: 0 0 15px rgba(0, 242, 254, 0.25);
     
     --glass-blur: blur(14px);
@@ -59,9 +59,14 @@
     --text-secondary: #4b5563;
     --text-muted: #9ca3af;
     
+    --color-blue: #d97706; /* School Yellow (Amber/Orange for readability) */
+    --color-blue-gradient: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+    --color-purple: #1e40af; /* School Blue */
+    --color-purple-gradient: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+
     --shadow-main: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
-    --shadow-glow: 0 0 15px rgba(185, 39, 252, 0.15);
-    --shadow-glow-A: 0 0 15px rgba(0, 242, 254, 0.15);
+    --shadow-glow: 0 0 15px rgba(30, 64, 175, 0.25);
+    --shadow-glow-A: 0 0 15px rgba(217, 119, 6, 0.2);
 }
 
 /* Timetable Cards Light Theme overrides */
@@ -501,13 +506,13 @@ body {
 }
 
 .btn-accent-glow {
-    background: rgba(185, 39, 252, 0.1);
+    background: rgba(0, 229, 255, 0.1);
     color: var(--accent-B);
-    border: 1px solid rgba(185, 39, 252, 0.3);
+    border: 1px solid rgba(0, 229, 255, 0.3);
 }
 
 .btn-accent-glow:hover {
-    background: rgba(185, 39, 252, 0.2);
+    background: rgba(0, 229, 255, 0.2);
     box-shadow: var(--shadow-glow);
 }
 
@@ -2858,7 +2863,7 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: radial-gradient(ellipse at 50% 30%, rgba(185, 39, 252, 0.15) 0%, rgba(7, 9, 19, 0.97) 60%);
+    background: radial-gradient(ellipse at 50% 30%, rgba(0, 229, 255, 0.15) 0%, rgba(7, 9, 19, 0.97) 60%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2878,10 +2883,10 @@ body {
     width: 100%;
     max-width: 420px;
     background: rgba(17, 24, 42, 0.75);
-    border: 1px solid rgba(185, 39, 252, 0.3);
+    border: 1px solid rgba(0, 229, 255, 0.3);
     border-radius: 28px;
     padding: 2.5rem 2rem;
-    box-shadow: 0 8px 60px rgba(185, 39, 252, 0.2), 0 2px 16px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 8px 60px rgba(0, 229, 255, 0.2), 0 2px 16px rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     animation: slideUp 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
@@ -2902,20 +2907,20 @@ body {
     width: 58px;
     height: 58px;
     border-radius: 16px;
-    background: linear-gradient(135deg, #b927fc 0%, #4facfe 100%);
+    background: linear-gradient(135deg, #00e5ff 0%, #4facfe 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.6rem;
     color: white;
     margin: 0 auto 1rem;
-    box-shadow: 0 0 25px rgba(185, 39, 252, 0.5);
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.5);
 }
 
 .auth-header h2 {
     font-size: 1.8rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #b927fc 0%, #4facfe 100%);
+    background: linear-gradient(135deg, #00e5ff 0%, #4facfe 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 0.4rem;
@@ -2972,9 +2977,9 @@ body {
 }
 
 .auth-view .form-input:focus {
-    border-color: rgba(185, 39, 252, 0.5);
-    background: rgba(185, 39, 252, 0.05);
-    box-shadow: 0 0 0 3px rgba(185, 39, 252, 0.1);
+    border-color: rgba(0, 229, 255, 0.5);
+    background: rgba(0, 229, 255, 0.05);
+    box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.1);
 }
 
 .auth-view .form-input::placeholder {
@@ -3021,7 +3026,7 @@ body {
 .auth-view select.form-input {
     appearance: none;
     -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23b927fc' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2300e5ff' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 2.5rem;
@@ -3035,4 +3040,62 @@ body {
         padding: 2rem 1.25rem;
         border-radius: 20px;
     }
+}
+
+/* Class Details Modal styling */
+.class-details-header {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+[data-theme="light"] .class-details-header {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%);
+}
+
+.class-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    transition: var(--transition-smooth);
+}
+
+.class-detail-item:hover {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+}
+
+[data-theme="light"] .class-detail-item {
+    background: rgba(0, 0, 0, 0.01);
+}
+
+[data-theme="light"] .class-detail-item:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.class-detail-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-B);
+    font-size: 1.1rem;
+    transition: var(--transition-smooth);
+}
+
+[data-theme="light"] .class-detail-icon {
+    background: rgba(0, 0, 0, 0.03);
 }

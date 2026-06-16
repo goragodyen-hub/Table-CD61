@@ -623,6 +623,66 @@
         </div>
     </div>
 
+    <!-- MODAL 1.5: CLASS DETAILS VIEW -->
+    <div class="modal" id="class-details-modal">
+        <div class="modal-content glass-card animate-zoom" style="max-width: 440px;">
+            <div class="modal-header" style="border-bottom: none; padding-bottom: 0.5rem; position: relative;">
+                <div id="class-details-color-indicator" style="position: absolute; left: 0; top: 0; width: 100%; height: 8px; background: var(--accent-B);"></div>
+                <h3 style="margin-top: 10px; font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-book-open"></i> รายละเอียดวิชาเรียน
+                </h3>
+                <button class="close-btn" id="class-details-modal-close" style="margin-top: 10px;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" style="padding-top: 0.5rem;">
+                <!-- Subject Header Card -->
+                <div class="class-details-header" id="class-details-header">
+                    <h2 id="class-details-name" style="font-size: 1.4rem; font-weight: 800; margin-bottom: 0.25rem; line-height: 1.3;">วิทยาศาสตร์พื้นฐาน 3</h2>
+                    <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-top: 0.5rem;">
+                        <span id="class-details-week-badge" class="table-week-badge week-A">สัปดาห์ A</span>
+                        <span id="class-details-day-badge" style="background: rgba(255, 255, 255, 0.05); color: var(--text-primary); border: 1px solid var(--border-color); padding: 0.2rem 0.5rem; border-radius: 6px; font-weight: 700; font-size: 0.7rem;">วันอังคาร</span>
+                    </div>
+                </div>
+                
+                <!-- Detail Rows -->
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div class="class-detail-item">
+                        <div class="class-detail-icon">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">เวลาเรียน</span>
+                            <span id="class-details-time" style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">08:00 - 08:50 น.</span>
+                        </div>
+                    </div>
+                    
+                    <div class="class-detail-item">
+                        <div class="class-detail-icon">
+                            <i class="fa-solid fa-user-tie"></i>
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">ครูผู้สอน</span>
+                            <span id="class-details-teacher" style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">ครูนันทิชา</span>
+                        </div>
+                    </div>
+                    
+                    <div class="class-detail-item">
+                        <div class="class-detail-icon">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">ห้องเรียน / อาคาร</span>
+                            <span id="class-details-room" style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">Lab ชีวะ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;">
+                <button class="btn btn-secondary-outline btn-sm" id="class-details-edit-btn" style="flex: 1;"><i class="fa-solid fa-edit"></i> แก้ไขข้อมูลวิชา</button>
+                <button class="btn btn-primary btn-sm" id="class-details-close-btn" style="flex: 1;"><i class="fa-solid fa-check"></i> ตกลง</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL 2: ADD/EDIT TASK -->
     <div class="modal" id="task-modal">
         <div class="modal-content glass-card animate-zoom">

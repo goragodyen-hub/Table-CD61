@@ -1292,6 +1292,16 @@ class StudyTableApp {
                 }
             });
         }
+        
+        // Class Details Modal close handlers
+        const classDetailsModalClose = document.getElementById('class-details-modal-close');
+        const classDetailsCloseBtn = document.getElementById('class-details-close-btn');
+        if (classDetailsModalClose) {
+            classDetailsModalClose.addEventListener('click', () => this.closeClassDetailsModal());
+        }
+        if (classDetailsCloseBtn) {
+            classDetailsCloseBtn.addEventListener('click', () => this.closeClassDetailsModal());
+        }
     }
     // ----------------------------------------------------
     // NAVIGATION & LAYOUT RENDERERS
@@ -1538,6 +1548,8 @@ class StudyTableApp {
                     <div class="class-details">
                         <h4>${slot.name}</h4>
                         <div class="class-meta-row">
+                            ${slot.teacher ? `<span title="ครูผู้สอน: ${slot.teacher}"><i class="fa-solid fa-user-tie"></i> ${slot.teacher}</span>` : ''}
+                            ${slot.room ? `<span title="ห้องเรียน: ${slot.room}"><i class="fa-solid fa-location-dot"></i> ${slot.room}</span>` : ''}
                         </div>
                     </div>
                 `;
@@ -1750,6 +1762,7 @@ class StudyTableApp {
                 }
                 
                 card.addEventListener('click', (e) => {
+                    this.openClassDetailsModal(slot);
                 });
                 // Quick double-click action to edit
                 if (!isGuest) {
@@ -3044,6 +3057,65 @@ class StudyTableApp {
 
         // Load initially
         this.fetchAndRenderAdminStudents();
+    }
+
+    openClassDetailsModal(slot) {
+        const modal = document.getElementById('class-details-modal');
+        const nameEl = document.getElementById('class-details-name');
+        const colorIndicator = document.getElementById('class-details-color-indicator');
+        const weekBadge = document.getElementById('class-details-week-badge');
+        const dayBadge = document.getElementById('class-details-day-badge');
+        const timeEl = document.getElementById('class-details-time');
+        const teacherEl = document.getElementById('class-details-teacher');
+        const roomEl = document.getElementById('class-details-room');
+        const editBtn = document.getElementById('class-details-edit-btn');
+        
+        if (!modal) return;
+        
+        nameEl.textContent = slot.name;
+        colorIndicator.style.background = slot.color;
+        
+        // Setup Week Badge
+        weekBadge.textContent = `สัปดาห์ ${slot.week}`;
+        weekBadge.className = `table-week-badge week-${slot.week}`;
+        if (slot.week === 'A') {
+            weekBadge.style.background = 'rgba(217, 119, 6, 0.15)';
+            weekBadge.style.color = 'var(--color-blue)';
+            weekBadge.style.borderColor = 'rgba(217, 119, 6, 0.3)';
+        } else {
+            weekBadge.style.background = 'rgba(30, 64, 175, 0.15)';
+            weekBadge.style.color = 'var(--color-purple)';
+            weekBadge.style.borderColor = 'rgba(30, 64, 175, 0.3)';
+        }
+        
+        // Setup Day Badge
+        const dayNames = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
+        dayBadge.textContent = dayNames[slot.day];
+        
+        // Setup details text
+        timeEl.textContent = `${slot.startTime} - ${slot.endTime} น.`;
+        teacherEl.textContent = slot.teacher || 'ไม่ระบุครูผู้สอน';
+        roomEl.textContent = slot.room || 'ไม่ระบุห้องเรียน';
+        
+        // Setup edit btn visibility based on guest mode
+        const isGuest = this.state.profile && this.state.profile.isGuest;
+        if (isGuest) {
+            editBtn.style.display = 'none';
+        } else {
+            editBtn.style.display = 'inline-flex';
+            // Bind click to open standard edit class modal
+            editBtn.onclick = () => {
+                this.closeClassDetailsModal();
+                this.openClassModal(slot.id);
+            };
+        }
+        
+        modal.classList.add('active');
+    }
+    
+    closeClassDetailsModal() {
+        const modal = document.getElementById('class-details-modal');
+        if (modal) modal.classList.remove('active');
     }
 }
 // Instantiate App globally for events accessibility
