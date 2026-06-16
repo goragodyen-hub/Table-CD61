@@ -1,0 +1,26 @@
+name: Supabase Keep-Alive Ping
+
+on:
+  schedule:
+    # Runs every 3 days at 02:00 UTC (09:00 Thailand time)
+    - cron: '0 2 */3 * *'
+  workflow_dispatch: # allow manual trigger from GitHub UI
+
+jobs:
+  keepalive:
+    name: Ping Supabase to prevent auto-pause
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping Supabase REST API
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/profiles?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+          echo "Supabase ping status: $STATUS"
+          if [ "$STATUS" -ne 200 ]; then
+            echo "❌ Ping failed with status $STATUS"
+            exit 1
+          fi
+          echo "✅ Supabase is alive!"
