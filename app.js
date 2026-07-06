@@ -1985,22 +1985,35 @@ class StudyTableApp {
                 
                 // Due date warning styling
                 const isOverdue = !task.completed && task.dueDate < todayStr;
+                let metaHtml = '';
+                if (task.subject) {
+                    metaHtml += `<span class="task-meta-subject" style="margin-right: 8px;"><i class="fa-solid fa-book"></i> ${task.subject}</span>`;
+                }
+                metaHtml += `<span class="task-meta-due ${isOverdue ? 'overdue' : ''}"><i class="fa-regular fa-clock"></i> ${task.dueDate}</span>`;
+                
+                let notesHtml = '';
+                if (task.notes) {
+                    notesHtml += `<p class="task-notes" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 6px; line-height: 1.4;"><i class="fa-solid fa-align-left" style="opacity: 0.7; margin-right: 4px;"></i> ${task.notes}</p>`;
+                }
+
                 item.innerHTML = `
                     <div class="task-card-left">
                         <div class="task-checkbox-huge" onclick="app.toggleTaskCompletion('${task.id}')">
                             <i class="fa-solid fa-check"></i>
                         </div>
                         <div class="task-card-info">
-                            <h4>${task.title}</h4>
-                            <div class="task-card-meta">
-                                <span class="task-meta-due ${isOverdue ? 'overdue' : ''}">
-                                </span>
+                            <h4 style="margin-bottom: 2px;">${task.title}</h4>
+                            ${notesHtml}
+                            <div class="task-card-meta" style="margin-top: 6px;">
+                                ${metaHtml}
                             </div>
                         </div>
                     </div>
                     <div class="task-card-right">
+                        <button class="task-act-btn" onclick="app.openTaskModal('${task.id}')" title="แก้ไข">
                             <i class="fa-solid fa-pen"></i>
                         </button>
+                        <button class="task-act-btn delete" onclick="app.deleteTask('${task.id}')" title="ลบ">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
