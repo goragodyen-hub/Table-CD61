@@ -1396,26 +1396,28 @@ class StudyTableApp {
         return monday.toISOString().split('T')[0];
     }
     checkAutoWeekSwitch() {
+        if (!this.state.auto_week_switch) return;
+        
+        // Epoch Date: วันจันทร์ที่ 6 กรกฎาคม 2026 เป็น "สัปดาห์ A"
+        const epochMondayStr = "2026-07-06";
         const currentMondayStr = this.getMondayStr(new Date());
         
-        if (!this.state.last_week_monday) {
-            this.state.last_week_monday = currentMondayStr;
-            this.saveState();
-            return;
-        }
-        if (this.state.auto_week_switch) {
-            const msPerWeek = 7 * 24 * 60 * 60 * 1000;
-            const diffMs = new Date(currentMondayStr) - new Date(this.state.last_week_monday);
-            const diffWeeks = Math.round(diffMs / msPerWeek);
-            if (diffWeeks > 0) {
-                if (diffWeeks % 2 === 1) {
-                    this.state.active_week = this.state.active_week === 'A' ? 'B' : 'A';
-                }
+        const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+        const diffMs = new Date(currentMondayStr) - new Date(epochMondayStr);
+        
+        const diffWeeks = Math.round(diffMs / msPerWeek);
+        
+        if (diffWeeks >= 0) {
+            // ถ้าผ่านไปเป็นจำนวนเลขคู่ (0, 2, 4...) = สัปดาห์ A
+            // ถ้าผ่านไปเป็นจำนวนเลขคี่ (1, 3, 5...) = สัปดาห์ B
+            const calculatedWeek = (diffWeeks % 2 === 0) ? 'A' : 'B';
+            
+            if (this.state.active_week !== calculatedWeek) {
+                this.state.active_week = calculatedWeek;
+                this.state.viewing_week = calculatedWeek;
+                this.saveState();
             }
         }
-        
-        this.state.last_week_monday = currentMondayStr;
-        this.saveState();
     }
     resetToChitraladaTimetable() {
         this.loadMockData();
