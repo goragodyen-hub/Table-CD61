@@ -3099,3 +3099,68 @@ body {
 [data-theme="light"] .class-detail-icon {
     background: rgba(0, 0, 0, 0.03);
 }
+
+/* =========================================================================
+   EXAM SCHEDULE TABLE STYLES
+   ========================================================================= */
+.exam-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 12px;
+}
+
+.exam-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    text-align: left;
+}
+
+.exam-table th,
+.exam-table td {
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.exam-table thead th {
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.exam-day {
+    background-color: var(--bg-dark);
+    text-align: center;
+    min-width: 130px;
+    color: var(--accent-B);
+}
+
+[data-theme="light"] .exam-day {
+    background-color: #f1f5f9;
+}
+
+.exam-day strong {
+    display: block;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+}
+
+.exam-break {
+    background-color: rgba(255, 255, 255, 0.02);
+    font-style: italic;
+    color: var(--text-muted);
+}
+
+[data-theme="light"] .exam-break {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.exam-subject {
+    font-weight: 600;
+    color: var(--text-primary);
+}

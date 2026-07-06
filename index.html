@@ -134,6 +134,10 @@
                     <i class="fa-solid fa-list-check"></i>
                     <span>งาน & การบ้าน</span>
                 </a>
+                <a href="#" class="menu-item" data-view="exams" id="nav-exams">
+                    <i class="fa-solid fa-file-pen"></i>
+                    <span>ตารางสอบ มิดเทอม</span>
+                </a>
                 <a href="#" class="menu-item" data-view="pomodoro" id="nav-pomodoro">
                     <i class="fa-solid fa-stopwatch"></i>
                     <span>จับเวลาโฟกัส</span>
@@ -319,6 +323,84 @@
                 <div class="timetable-grid-wrapper">
                     <div class="timetable-grid" id="timetable-grid-root">
                         <!-- Hour Column headers and day row headers will be drawn here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW EXAMS: MIDTERM -->
+            <section class="content-view" id="view-exams">
+                <div class="view-header">
+                    <div class="title-area">
+                        <h2 class="view-title">ตารางสอบกลางภาคเรียนที่ 1</h2>
+                        <p class="view-subtitle">ชั้น ม.2 ปีการศึกษา 2569</p>
+                    </div>
+                </div>
+
+                <div class="card exam-schedule-card" style="margin-top: 1.5rem;">
+                    <div class="card-body" style="padding: 0;">
+                        <div class="exam-table-wrapper">
+                            <table class="exam-table">
+                                <thead>
+                                    <tr>
+                                        <th>วัน</th>
+                                        <th>เวลา</th>
+                                        <th>วิชา</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Monday -->
+                                    <tr>
+                                        <td rowspan="5" class="exam-day"><strong>วันจันทร์</strong><br><small>13 กรกฎาคม 2569</small></td>
+                                        <td>08.30 – 10.00 น.</td>
+                                        <td class="exam-subject">คณิตศาสตร์พื้นฐาน 3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>10.05 – 11.05 น.</td>
+                                        <td class="exam-subject">ภาษาจีนเบื้องต้น 3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>11.10 – 12.10 น.</td>
+                                        <td class="exam-subject">ประวัติศาสตร์ 3</td>
+                                    </tr>
+                                    <tr class="exam-break">
+                                        <td>12.10 – 13.00 น.</td>
+                                        <td>พักกลางวัน</td>
+                                    </tr>
+                                    <tr>
+                                        <td>13.00 – 14.30 น.</td>
+                                        <td class="exam-subject">ภาษาอังกฤษพื้นฐาน 3</td>
+                                    </tr>
+                                    <!-- Wednesday -->
+                                    <tr>
+                                        <td rowspan="4" class="exam-day"><strong>วันพุธ</strong><br><small>15 กรกฎาคม 2569</small></td>
+                                        <td>08.30 – 10.00 น.</td>
+                                        <td class="exam-subject">วิทยาศาสตร์พื้นฐาน 3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>10.05 – 11.35 น.</td>
+                                        <td class="exam-subject">ภาษาไทยพื้นฐาน 3</td>
+                                    </tr>
+                                    <tr class="exam-break">
+                                        <td>11.35 – 13.00 น.</td>
+                                        <td>พักกลางวัน</td>
+                                    </tr>
+                                    <tr>
+                                        <td>13.00 – 14.00 น.</td>
+                                        <td class="exam-subject">ทักษะการใช้ภาษาอังกฤษ 3</td>
+                                    </tr>
+                                    <!-- Friday -->
+                                    <tr>
+                                        <td rowspan="2" class="exam-day"><strong>วันศุกร์</strong><br><small>17 กรกฎาคม 2569</small></td>
+                                        <td>08.30 – 09.30 น.</td>
+                                        <td class="exam-subject">คณิตศาสตร์เสริม 3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>09.35 – 11.05 น.</td>
+                                        <td class="exam-subject">สังคมศึกษาพื้นฐาน 3</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </section>
