@@ -99,6 +99,16 @@ class StudyTableApp {
             this.saveState();
             localStorage.setItem('study_table_tasks_cleared_v1', 'true');
         }
+
+        // Auto update timetable when new deployment/version is published
+        const CURRENT_TIMETABLE_VERSION = '2026_term2_oct22_v1';
+        const savedVersion = localStorage.getItem('study_table_timetable_version');
+        if (savedVersion !== CURRENT_TIMETABLE_VERSION) {
+            console.log(`[Timetable] New timetable version detected (${CURRENT_TIMETABLE_VERSION}). Auto-syncing timetable...`);
+            this.updateTimetableToLatest(null, false);
+            localStorage.setItem('study_table_timetable_version', CURRENT_TIMETABLE_VERSION);
+        }
+
         this.setupDOMReferences();
         this.setupEventListeners();
         this.setupAuth();
@@ -536,10 +546,15 @@ class StudyTableApp {
             this.views = this.views.filter(v => v !== 'admin');
         }
 
-        // Dynamically update the reset default timetable button text
+        // Dynamically update the reset/update default timetable button text
+        const currentClass = this.state.profile ? this.state.profile.classroom : 'ม.2/3';
         if (this.resetDefaultTimetableBtn) {
-            this.resetDefaultTimetableBtn.innerHTML = `<i class="fa-solid fa-arrow-rotate-left"></i> โหลดตารางเรียนเริ่มต้น ${this.state.profile.classroom}`;
-            this.resetDefaultTimetableBtn.setAttribute('title', `โหลดค่าเริ่มต้นจากตารางเรียน ${this.state.profile.classroom}`);
+            this.resetDefaultTimetableBtn.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> โหลดตารางเริ่มต้น ${currentClass}`;
+            this.resetDefaultTimetableBtn.setAttribute('title', `โหลดค่าเริ่มต้นจากตารางเรียนล่าสุด ${currentClass}`);
+            this.resetDefaultTimetableBtn.style.display = 'inline-flex';
+        }
+        if (this.viewUpdateTimetableBtn) {
+            this.viewUpdateTimetableBtn.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> อัปเดตตาราง ${currentClass} ล่าสุด`;
         }
     }
 
@@ -769,7 +784,7 @@ class StudyTableApp {
             console.error("Error saving state:", e);
         }
     }
-    loadMockData(classroom = null) {
+    getTimetableTemplate(classroom = null) {
         if (!classroom && this.state.profile && this.state.profile.classroom) {
             classroom = this.state.profile.classroom;
         }
@@ -1011,32 +1026,152 @@ class StudyTableApp {
         ];
 
         // Select timetable based on classroom
+        let targetA, targetB;
         if (classroom === 'ม.2/1') {
-            this.state.timetable_A = JSON.parse(JSON.stringify(baseA_2_1));
-            this.state.timetable_B = JSON.parse(JSON.stringify(baseB_2_1));
+            targetA = baseA_2_1;
+            targetB = baseB_2_1;
         } else if (classroom === 'ม.2/2') {
-            this.state.timetable_A = JSON.parse(JSON.stringify(baseA_2_2));
-            this.state.timetable_B = JSON.parse(JSON.stringify(baseB_2_2));
+            targetA = baseA_2_2;
+            targetB = baseB_2_2;
         } else {
-            this.state.timetable_A = JSON.parse(JSON.stringify(baseA_2_3));
-            this.state.timetable_B = JSON.parse(JSON.stringify(baseB_2_3));
+            targetA = baseA_2_3;
+            targetB = baseB_2_3;
         }
 
-        // Ensure all mock timetable slots have valid UUIDs for Supabase compatibility
-        this.state.timetable_A.forEach(slot => {
+        const timetable_A = JSON.parse(JSON.stringify(targetA));
+        const timetable_B = JSON.parse(JSON.stringify(targetB));
+
+        // Ensure all timetable slots have valid UUIDs for Supabase compatibility
+        timetable_A.forEach(slot => {
             if (!isValidUUID(slot.id)) slot.id = generateUUID();
         });
-        this.state.timetable_B.forEach(slot => {
+        timetable_B.forEach(slot => {
             if (!isValidUUID(slot.id)) slot.id = generateUUID();
         });
 
-        // Mock Tasks
+        return { classroom, timetable_A, timetable_B };
+    }
+
+    loadMockData(classroom = null) {
+        const template = this.getTimetableTemplate(classroom);
+        this.state.timetable_A = template.timetable_A;
+        this.state.timetable_B = template.timetable_B;
         this.state.tasks = [];
-        
         if (!this.state.active_week) this.state.active_week = 'A';
         if (!this.state.viewing_week) this.state.viewing_week = 'A';
-        
         this.saveState();
+    }
+
+    async updateTimetableToLatest(classroom = null, showNotification = true) {
+        if (!classroom && this.state.profile && this.state.profile.classroom) {
+            classroom = this.state.profile.classroom;
+        }
+        if (!classroom) classroom = 'ม.2/3';
+
+        // 1. ดึงข้อมูลตารางเรียนเทอม 2 ล่าสุดตามห้อง
+        const template = this.getTimetableTemplate(classroom);
+        this.state.timetable_A = template.timetable_A;
+        this.state.timetable_B = template.timetable_B;
+        this.saveState();
+        localStorage.setItem('study_table_last_updated', new Date().toISOString());
+
+        // 2. ตรวจสอบการสลับสัปดาห์อัตโนมัติตาม Epoch ปัจจุบัน
+        this.checkAutoWeekSwitch();
+
+        // 3. ซิงค์ขึ้น Supabase สำหรับผู้ใช้ที่ล็อกอิน (ไม่ใช่ Guest)
+        const isGuest = this.state.profile && this.state.profile.isGuest;
+        if (!isGuest && supabaseClient && this.state.profile && this.state.profile.id) {
+            try {
+                await this.uploadTimetableToSupabase();
+            } catch (err) {
+                console.warn('[Update Timetable] Supabase sync notice:', err);
+            }
+        }
+
+        // 4. สั่งตรวจสอบ Service Worker Updates เพื่อให้ PWA รับไฟล์ล่าสุด
+        if ('serviceWorker' in navigator) {
+            try {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (const reg of registrations) {
+                    await reg.update();
+                }
+            } catch (swErr) {
+                console.warn('[Service Worker] Update check notice:', swErr);
+            }
+        }
+
+        // 5. เรนเดอร์ UI ใหม่
+        this.renderAll();
+
+        // 6. แสดง Toast Notification แจ้งเตือนความสำเร็จ
+        if (showNotification) {
+            this.showToastNotification(
+                'อัปเดตตารางเรียนล่าสุดสำเร็จ! 🎉',
+                `ระบบได้อัปเดตตารางเรียนชั้น ${classroom} (ภาคเรียนที่ 2/2569) เป็นข้อมูลล่าสุดตามประกาศโรงเรียนเรียบร้อยแล้ว`,
+                'success'
+            );
+        }
+    }
+
+    promptUpdateTimetable() {
+        const classroom = (this.state.profile && this.state.profile.classroom) ? this.state.profile.classroom : 'ม.2/3';
+        if (confirm(`คุณต้องการดึงข้อมูลและอัปเดตตารางเรียนชั้น ${classroom} (เทอม 2/2569) เป็นเวอร์ชันล่าสุดใช่หรือไม่?\n\n(ระบบจะดึงข้อมูลวิชา ห้องเรียน ครูผู้สอนล่าสุดตามประกาศของโรงเรียน)`)) {
+            this.updateTimetableToLatest(classroom, true);
+        }
+    }
+
+    showToastNotification(title, message, type = 'info') {
+        const container = document.getElementById('study-toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `study-toast toast-${type}`;
+        
+        let iconClass = 'fa-solid fa-circle-check';
+        if (type === 'info') iconClass = 'fa-solid fa-circle-info';
+        if (type === 'warning') iconClass = 'fa-solid fa-triangle-exclamation';
+
+        toast.innerHTML = `
+            <div class="study-toast-icon">
+                <i class="${iconClass}"></i>
+            </div>
+            <div class="study-toast-content">
+                <div class="study-toast-title">${title}</div>
+                <div class="study-toast-message">${message}</div>
+                <div class="study-toast-actions">
+                    <button class="btn btn-xs btn-primary" onclick="window.location.reload(true)">
+                        <i class="fa-solid fa-rotate-right"></i> รีเฟรชหน้าเว็บ
+                    </button>
+                    <button class="btn btn-xs btn-secondary-outline study-toast-dismiss-btn">
+                        ปิด
+                    </button>
+                </div>
+            </div>
+            <button class="study-toast-close" title="ปิดการแจ้งเตือน">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        `;
+
+        const dismiss = () => {
+            toast.classList.add('toast-hiding');
+            setTimeout(() => {
+                if (toast.parentElement) toast.parentElement.removeChild(toast);
+            }, 300);
+        };
+
+        const closeBtn = toast.querySelector('.study-toast-close');
+        if (closeBtn) closeBtn.addEventListener('click', dismiss);
+        const dismissBtn = toast.querySelector('.study-toast-dismiss-btn');
+        if (dismissBtn) dismissBtn.addEventListener('click', dismiss);
+
+        container.appendChild(toast);
+
+        // Auto dismiss after 6.5 seconds
+        setTimeout(() => {
+            if (document.body.contains(toast)) {
+                dismiss();
+            }
+        }, 6500);
     }
     // ----------------------------------------------------
     // SETUP REFERENCES & BINDINGS
@@ -1063,6 +1198,9 @@ class StudyTableApp {
         this.timetableWeekViewingStatus = document.getElementById('timetable-week-viewing-status');
         this.setCurrentWeekActiveBtn = document.getElementById('set-current-week-active-btn');
         this.resetDefaultTimetableBtn = document.getElementById('reset-default-timetable-btn');
+        this.headerUpdateTimetableBtn = document.getElementById('header-update-timetable-btn');
+        this.sidebarUpdateTimetableBtn = document.getElementById('sidebar-update-timetable-btn');
+        this.viewUpdateTimetableBtn = document.getElementById('view-update-timetable-btn');
         // Tasks elements
         this.addTaskBtn = document.getElementById('add-task-btn');
         this.tasksListRoot = document.getElementById('tasks-list-root');
@@ -1184,7 +1322,22 @@ class StudyTableApp {
         });
         if (this.resetDefaultTimetableBtn) {
             this.resetDefaultTimetableBtn.addEventListener('click', () => {
-                this.resetToChitraladaTimetable();
+                this.promptUpdateTimetable();
+            });
+        }
+        if (this.headerUpdateTimetableBtn) {
+            this.headerUpdateTimetableBtn.addEventListener('click', () => {
+                this.promptUpdateTimetable();
+            });
+        }
+        if (this.sidebarUpdateTimetableBtn) {
+            this.sidebarUpdateTimetableBtn.addEventListener('click', () => {
+                this.promptUpdateTimetable();
+            });
+        }
+        if (this.viewUpdateTimetableBtn) {
+            this.viewUpdateTimetableBtn.addEventListener('click', () => {
+                this.promptUpdateTimetable();
             });
         }
         // Modals opening
@@ -1420,8 +1573,7 @@ class StudyTableApp {
         }
     }
     resetToChitraladaTimetable() {
-        this.loadMockData();
-        this.renderAll();
+        this.promptUpdateTimetable();
     }
     updateHeaderGreeting() {
         const now = new Date();
@@ -1496,7 +1648,7 @@ class StudyTableApp {
         }
         const resetDefaultTimetableBtn = document.getElementById('reset-default-timetable-btn');
         if (resetDefaultTimetableBtn) {
-            resetDefaultTimetableBtn.style.display = isGuest ? 'none' : 'inline-flex';
+            resetDefaultTimetableBtn.style.display = 'inline-flex';
         }
 
         // Call active view render

@@ -154,6 +154,9 @@
                 <button class="btn btn-secondary-outline btn-xs" id="sidebar-toggle-week-btn">
                     <i class="fa-solid fa-rotate"></i> สลับสัปดาห์
                 </button>
+                <button class="btn btn-accent-glow btn-xs" id="sidebar-update-timetable-btn" style="margin-top: 6px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 6px;" title="ดึงข้อมูลตารางเรียนเทอม 2 ล่าสุดตามประกาศโรงเรียน">
+                    <i class="fa-solid fa-arrows-rotate"></i> อัปเดตตารางล่าสุด
+                </button>
                 <label class="auto-week-toggle" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; margin-top: 8px; color: var(--text-secondary); cursor: pointer; user-select: none; border-top: 1px solid var(--border-color); padding-top: 8px;">
                     <input type="checkbox" id="sidebar-auto-week-checkbox" checked style="cursor: pointer; width: 14px; height: 14px; accent-color: var(--accent-B);">
                     <span>สลับอัตโนมัติทุกสัปดาห์</span>
@@ -194,6 +197,12 @@
                     <p id="header-date">วันพฤหัสบดีที่ 21 พฤษภาคม 2026 | สัปดาห์ปัจจุบัน: <strong class="text-accent-B">ตาราง B</strong></p>
                 </div>
                 <div class="header-actions">
+                    <!-- Update Timetable Button (Sync Latest Schedule) -->
+                    <button class="btn btn-xs btn-accent-glow" id="header-update-timetable-btn" title="อัปเดตตารางเรียนเทอม 2 ล่าสุด">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span class="btn-text-label">อัปเดตตาราง</span>
+                    </button>
+
                     <!-- Guest Logout Button (Highly visible on mobile/all screens in guest mode) -->
                     <button class="btn btn-xs btn-rose-glow guest-only" id="header-guest-logout-btn" style="display: none;" title="ออกจากโหมดผู้เยี่ยมชม">
                         <i class="fa-solid fa-right-from-bracket"></i>
@@ -291,9 +300,14 @@
                         <h2 class="view-title">จัดการตารางเรียนสลับรายสัปดาห์ (A/B Timetable)</h2>
                         <p class="view-subtitle">แยกระหว่างตาราง A และ B สำหรับโรงเรียนที่มีการสลับตารางเวียนสัปดาห์</p>
                     </div>
-                    <button class="btn btn-primary" id="add-class-btn">
-                        <i class="fa-solid fa-plus"></i> เพิ่มวิชาเรียนในตาราง
-                    </button>
+                    <div class="view-header-actions" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn btn-accent-glow" id="view-update-timetable-btn" title="ดึงข้อมูลตารางเรียนเทอม 2 ล่าสุดตามประกาศโรงเรียน">
+                            <i class="fa-solid fa-arrows-rotate"></i> อัปเดตตารางเรียนล่าสุด
+                        </button>
+                        <button class="btn btn-primary" id="add-class-btn">
+                            <i class="fa-solid fa-plus"></i> เพิ่มวิชาเรียนในตาราง
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Schedule Switch Tabs -->
@@ -313,8 +327,8 @@
                         <button class="btn btn-sm btn-accent-glow" id="set-current-week-active-btn">
                             <i class="fa-solid fa-star"></i> ตั้งค่าตารางนี้เป็น "สัปดาห์ปัจจุบัน"
                         </button>
-                        <button class="btn btn-sm btn-secondary-outline" id="reset-default-timetable-btn" title="โหลดค่าเริ่มต้นจากตารางเรียน ม.2/3 เข้าเฝ้า">
-                            <i class="fa-solid fa-arrow-rotate-left"></i> โหลดตารางเรียนเริ่มต้น ม.2/3
+                        <button class="btn btn-sm btn-secondary-outline" id="reset-default-timetable-btn" title="โหลดค่าเริ่มต้นจากตารางเรียนล่าสุด">
+                            <i class="fa-solid fa-arrows-rotate"></i> โหลดตารางเรียนเริ่มต้น
                         </button>
                     </div>
                 </div>
@@ -794,6 +808,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Toast Notification Container -->
+    <div id="study-toast-container" class="study-toast-container" aria-live="polite"></div>
 
     <!-- Supabase JS Client SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
