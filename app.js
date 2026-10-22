@@ -1602,7 +1602,7 @@ class StudyTableApp {
         
         let greeting = `สวัสดี${timeOfDayLabel} ยินดีต้อนรับสู่ระบบวางแผนการเรียน ${classroom} ${nickname}! ${emoji}`;
         if (isGuest) {
-            greeting = `สวัสดี${timeOfDayLabel} คุณกำลังเยี่ยมชมตารางเรียนชั้น ${classroom} (โหมดอ่านอย่างเดียว)! ${emoji}`;
+            greeting = `สวัสดี${timeOfDayLabel} ยินดีต้อนรับสู่ห้อง ${classroom} ${emoji}`;
         }
         if (nickname.toLowerCase() === 'goragod') {
             greeting = `สวัสดีคุณครู${timeOfDayLabel} ${nickname}! ยินดีต้อนรับสู่ระบบแดชบอร์ดจัดการนักเรียน! 👑`;
@@ -1630,7 +1630,7 @@ class StudyTableApp {
         }
         
         if (this.headerWeekBanner) {
-            this.headerWeekBanner.innerHTML = `<span class="pulse-indicator"></span><span>ขณะนี้ใช้งาน: <strong class="text-accent-${this.state.active_week}">ตาราง ${this.state.active_week}</strong></span>`;
+            this.headerWeekBanner.innerHTML = `<span class="pulse-indicator"></span><span><span class="banner-label">ขณะนี้ใช้งาน: </span><strong class="text-accent-${this.state.active_week}">ตาราง ${this.state.active_week}</strong></span>`;
         }
         // Guest mode UI updates
         const isGuest = this.state.profile && this.state.profile.isGuest;
